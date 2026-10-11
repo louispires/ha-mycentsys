@@ -27,6 +27,51 @@ class MyCentsysAuthError(MyCentsysError):
     """The token was rejected; the user has to sign in again."""
 
 
+class CaseInsensitiveDict(dict):
+    """A response object whose keys match whatever case the server used.
+
+    The gateway is ASP.NET, so whether it answers in PascalCase or camelCase
+    depends on how the server is configured. The app's C# client is built on
+    Newtonsoft, which matches either way, so the wire casing was never pinned
+    down. Everything here asks for the PascalCase name from the models.
+    """
+
+    def __getitem__(self, key: Any) -> Any:
+        try:
+            return super().__getitem__(key)
+        except KeyError:
+            if isinstance(key, str):
+                folded = key.casefold()
+                for existing, value in self.items():
+                    if isinstance(existing, str) and existing.casefold() == folded:
+                        return value
+            raise
+
+    def get(self, key: Any, default: Any = None) -> Any:
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+    def __contains__(self, key: Any) -> bool:
+        try:
+            self[key]
+        except KeyError:
+            return False
+        return True
+
+
+def case_insensitive(value: Any) -> Any:
+    """Re-wrap decoded JSON so nested objects ignore key casing too."""
+    if isinstance(value, dict):
+        return CaseInsensitiveDict(
+            {key: case_insensitive(item) for key, item in value.items()}
+        )
+    if isinstance(value, list):
+        return [case_insensitive(item) for item in value]
+    return value
+
+
 class GatewayApi:
     """Thin wrapper over the handful of routes this integration needs."""
 
@@ -65,8 +110,18 @@ class GatewayApi:
             token=self._service_token,
             json={"MobileNumber": phone, "Otp": otp},
         )
-        token = (result or {}).get("Response") if isinstance(result, dict) else None
-        if not token:
+        if isinstance(result, dict):
+            token = result.get("Response")
+        elif isinstance(result, str) and result.count(".") == 2:
+            # Some deployments hand the JWT back bare rather than wrapped.
+            token = result
+        else:
+            token = None
+        if not token or not isinstance(token, str):
+            _LOGGER.debug(
+                "ValidateOtp returned no token; response was %s",
+                sorted(result) if isinstance(result, dict) else type(result).__name__,
+            )
             raise MyCentsysAuthError("OTP rejected")
         self.user_token = token
         return token
@@ -131,6 +186,7 @@ class GatewayApi:
                 url, headers=headers, timeout=_TIMEOUT, **body
             ) as resp:
                 text = await resp.text()
+                _LOGGER.debug("%s -> HTTP %s (%s bytes)", route, resp.status, len(text))
                 if resp.status in (401, 403):
                     raise MyCentsysAuthError(f"HTTP {resp.status} from {route}")
                 if resp.status >= 400:
@@ -142,7 +198,7 @@ class GatewayApi:
                 if not text.strip():
                     return None
                 try:
-                    return await resp.json(content_type=None)
+                    return case_insensitive(await resp.json(content_type=None))
                 except ValueError:
                     return text
         except aiohttp.ClientError as err:

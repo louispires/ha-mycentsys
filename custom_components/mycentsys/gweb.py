@@ -15,7 +15,7 @@ from typing import Any
 
 import aiohttp
 
-from .api import MyCentsysError
+from .api import MyCentsysError, case_insensitive
 from .const import GWEB_URL
 
 _LOGGER = logging.getLogger(__name__)
@@ -94,7 +94,7 @@ class GwebApi:
         if "No Buttons for this number" in text:
             return []
         try:
-            root = json.loads(text.replace("\\", "").strip('"'))
+            root = case_insensitive(json.loads(text.replace("\\", "").strip('"')))
         except ValueError as err:
             raise MyCentsysError("G-Web device list was not valid JSON") from err
 

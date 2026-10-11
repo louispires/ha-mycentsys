@@ -16,7 +16,13 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-MODULES = ("test_protocol", "test_const", "test_mqtt_session", "test_cover_logic")
+MODULES = (
+    "test_protocol",
+    "test_const",
+    "test_api_shapes",
+    "test_mqtt_session",
+    "test_cover_logic",
+)
 
 
 def main() -> int:
