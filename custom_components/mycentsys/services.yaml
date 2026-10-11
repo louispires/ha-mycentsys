@@ -1,8 +1,12 @@
 activate:
-  target:
-    device:
-      integration: mycentsys
   fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          filter:
+            - integration: mycentsys
+          multiple: true
     trigger_id:
       required: true
       example: 34

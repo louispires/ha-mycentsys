@@ -114,9 +114,8 @@ For an activation with no button, use the service:
 
 ```yaml
       - action: mycentsys.activate
-        target:
-          device_id: 1a2b3c…
         data:
+          device_id: 1a2b3c…
           trigger_id: 16   # courtesy light
 ```
 

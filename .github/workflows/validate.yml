@@ -23,6 +23,9 @@ jobs:
       - uses: hacs/action@main
         with:
           category: integration
+          # Only required to join the default HACS store, which this is not
+          # aiming for. It installs fine as a custom repository without it.
+          ignore: brands
 
   tests:
     name: Lint and tests
