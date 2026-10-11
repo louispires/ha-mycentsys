@@ -1,0 +1,12 @@
+{
+  "domain": "mycentsys",
+  "name": "MyCentsys Remote",
+  "codeowners": ["@louispires"],
+  "config_flow": true,
+  "documentation": "https://github.com/louispires/ha-mycentsys",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/louispires/ha-mycentsys/issues",
+  "requirements": ["paho-mqtt>=2.1.0"],
+  "version": "0.1.0"
+}

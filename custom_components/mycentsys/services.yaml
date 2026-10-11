@@ -1,0 +1,14 @@
+activate:
+  target:
+    device:
+      integration: mycentsys
+  fields:
+    trigger_id:
+      required: true
+      example: 34
+      default: 34
+      selector:
+        number:
+          min: 0
+          max: 255
+          mode: box

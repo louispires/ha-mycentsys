@@ -1,0 +1,71 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "MyCentsys Remote",
+        "description": "Enter the mobile number registered on your MyCentsys Remote account. A one-time pin will be sent to it.",
+        "data": {
+          "phone": "Mobile number",
+          "region": "Region",
+          "otp_channel": "Send the pin by",
+          "service_token": "App service token"
+        },
+        "data_description": {
+          "phone": "For example 0831234567 or +27831234567.",
+          "service_token": "Only needed if service_token.json was not installed alongside the integration."
+        }
+      },
+      "otp": {
+        "title": "Enter the one-time pin",
+        "description": "Enter the pin sent to {phone}.",
+        "data": {
+          "otp": "One-time pin"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach the MyCentsys servers.",
+      "invalid_phone": "That does not look like a mobile number in international format.",
+      "invalid_otp": "That pin was not accepted. Check it, or start again to request a new one.",
+      "invalid_service_token": "The app service token was rejected.",
+      "missing_service_token": "A service token is required to request a pin.",
+      "otp_refused": "The server would not send a pin to that number. Check the number and region."
+    },
+    "abort": {
+      "already_configured": "That mobile number is already set up.",
+      "reauth_successful": "Signed in again.",
+      "wrong_account": "That is a different mobile number. Enter the number this entry was set up with."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "MyCentsys options",
+        "data": {
+          "extra_activations": "Extra buttons",
+          "scan_interval": "Status poll interval",
+          "enable_gweb": "Include GSM / 4G (G-Web) devices"
+        },
+        "data_description": {
+          "extra_activations": "Open, close and stop are always available on the cover entity. Pick any additional activations you want as buttons. Ones your operator does not support will simply be refused when pressed."
+        }
+      }
+    }
+  },
+  "services": {
+    "activate": {
+      "name": "Activate",
+      "description": "Sends a raw activation id to a MyCentsys operator.",
+      "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "The operator to trigger."
+        },
+        "trigger_id": {
+          "name": "Trigger id",
+          "description": "The activation id, for example 34 for open/close or 35 for pedestrian."
+        }
+      }
+    }
+  }
+}
